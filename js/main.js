@@ -7,8 +7,9 @@ var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditio
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
-var xOffset = PIN_WIDTH / 2;
-var yOffset = PIN_HEIGHT / 2;
+var AMOUNT_OF_LISTINGS = 8;
+var X_OFFSET = PIN_WIDTH / 2;
+var Y_OFFSET = PIN_HEIGHT / 2;
 
 var map = document.querySelector('.map');
 var mapPinsList = map.querySelector('.map__pins');
@@ -64,7 +65,7 @@ var createListing = function (amountOfListings) {
         description: 'Описание вашего жилья',
         photos: generateArrayFromArray(PHOTOS, generateNumber(1, PHOTOS.length - 1)),
         location: {
-          x: generateNumber(xOffset, mapWidth - xOffset),
+          x: generateNumber(X_OFFSET, mapWidth - X_OFFSET),
           y: generateNumber(130, 630)
         }
       }
@@ -74,7 +75,7 @@ var createListing = function (amountOfListings) {
   return listings;
 };
 
-var similarListings = createListing(8);
+var similarListings = createListing(AMOUNT_OF_LISTINGS);
 
 map.classList.remove('map--faded');
 
@@ -82,7 +83,7 @@ var createPin = function (listing) {
   var mapPin = pinTemplate.cloneNode(true);
   var mapPinImage = mapPin.querySelector('img');
 
-  mapPin.style = 'left: ' + (listing.offer.location.x - xOffset) + 'px; top: ' + (listing.offer.location.y - yOffset) + 'px';
+  mapPin.style = 'left: ' + (listing.offer.location.x - X_OFFSET) + 'px; top: ' + (listing.offer.location.y - Y_OFFSET) + 'px';
   mapPinImage.src = listing.author.avatar;
   mapPinImage.alt = listing.offer.title;
 
