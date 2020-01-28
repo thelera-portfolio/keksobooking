@@ -109,7 +109,7 @@ var createInfoCard = function (listing) {
   var description = card.querySelector('.popup__description');
   var photosList = card.querySelector('.popup__photos');
   var photo = photosList.querySelector('.popup__photo');
-  var avatar = card.querySelectorAll('.popup__avatar');
+  var avatar = card.querySelector('.popup__avatar');
 
   if (!listing.offer.title) {
     title.remove();
@@ -206,7 +206,5 @@ var createInfoCard = function (listing) {
 
   return fragment;
 };*/
-console.log(similarListings[3]);
-console.log(createInfoCard(similarListings[3]));
 
-map.insertBefore(createInfoCard(similarListings[5]), map.querySelector('.map__filters-container'));
+map.insertBefore(createInfoCard(similarListings[0]), map.querySelector('.map__filters-container'));
