@@ -272,8 +272,7 @@ var amountOfRoomsInput = adForm.querySelector('select[name="rooms"]');
 var checkRoomsValidity = function () {
   if ((amountOfGuestsInput.value <= amountOfRoomsInput.value && amountOfGuestsInput.value > 0) || (amountOfGuestsInput.value === 0 && amountOfRoomsInput.value === 100)) {
     amountOfGuestsInput.setCustomValidity('');
-  }
-  else {
+  } else {
     amountOfGuestsInput.setCustomValidity('Поле заполнено неверно');
   }
 };
@@ -282,7 +281,7 @@ checkRoomsValidity();
 
 amountOfGuestsInput.addEventListener('change', function (evt) {
   checkRoomsValidity();
-  if(!adForm.checkValidity()) {
+  if (!adForm.checkValidity()) {
     evt.preventDefault();
     return;
   }
