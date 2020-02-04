@@ -9,8 +9,6 @@ var PIN_WIDTH = 50;
 var PIN_HEIGHT = 70;
 var MAIN_PIN_WIDTH = 62;
 var MAIN_PIN_HEIGHT = 84;
-// var MAIN_PIN_START_LEFT = 570;
-// var MAIN_PIN_START_TOP = 375;
 var MAIN_PIN_TAIL_HEIGHT = 22;
 var AMOUNT_OF_LISTINGS = 8;
 var X_OFFSET = PIN_WIDTH / 2;
@@ -186,16 +184,6 @@ var createInfoCard = function (listing) {
   return card;
 };
 
-// var createInfoCardList = function (listings) {
-//   var fragment = document.createDocumentFragment();
-
-//   for (var i = 0; i < listings.length; i += 1) {
-//     fragment.appendChild(createInfoCard(listings[i]));
-//   }
-
-//   return fragment;
-// };
-
 map.insertBefore(createInfoCard(similarListings[1]), map.querySelector('.map__filters-container'));
 
 // отключение полей формы
@@ -279,8 +267,11 @@ var checkRoomsValidity = function () {
 
 checkRoomsValidity();
 
-amountOfGuestsInput.addEventListener('change', function (evt) {
+amountOfGuestsInput.addEventListener('change', function () {
   checkRoomsValidity();
+});
+
+adForm.addEventListener('submit', function (evt) {
   if (!adForm.checkValidity()) {
     evt.preventDefault();
     return;
