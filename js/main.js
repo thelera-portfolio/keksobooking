@@ -209,7 +209,10 @@ var mapFilters = map.querySelector('.map__filters');
 var adFormAddressFiels = adForm.querySelector('input[name="address"]');
 
 var setBookingActiveState = function () {
-  mapPinsList.appendChild(createPinList(similarListings));
+  if (mapPinsList.children.length < similarListings.length) {
+    mapPinsList.appendChild(createPinList(similarListings));
+  }
+
   map.classList.remove('map--faded');
   adForm.classList.remove('ad-form--disabled');
   mapFilters.classList.remove('map__filters--disabled');
@@ -340,15 +343,21 @@ var closeListingCard = function () {
 };
 
 mapPinsList.addEventListener('click', function (evt) {
-  var pinImageElement = evt.target;
-  if (pinImageElement.alt && pinImageElement.alt !== 'Метка объявления') {
-    openListingCard(pinImageElement, similarListings);
+  if (evt.target.alt) {
+    openListingCard(evt.target, similarListings);
   }
 });
 
 mapPinsList.addEventListener('keydown', function (evt) {
-  var pinImageElement = evt.target.firstElementChild;
-  if (evt.key === ENTER_KEY && pinImageElement.alt !== 'Метка объявления') {
-    openListingCard(pinImageElement, similarListings);
+  if (evt.key === ENTER_KEY) {
+    openListingCard(evt.target.firstElementChild, similarListings);
   }
+});
+
+mapMainPin.addEventListener('keydown', function (evt) {
+  evt.stopPropagation();
+});
+
+mapMainPin.addEventListener('click', function (evt) {
+  evt.stopPropagation();
 });
