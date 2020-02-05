@@ -16,12 +16,21 @@ var Y_OFFSET = PIN_HEIGHT / 2;
 var X_OFFSET_MAIN_PIN = MAIN_PIN_WIDTH / 2;
 var Y_MIN = 130;
 var Y_MAX = 630;
+var ESC_KEY = 'Escape';
+var ENTER_KEY = 'Enter';
 
-var listingType = {
+var accomodationType = {
   palace: 'дворец',
   flat: 'квартира',
   house: 'дом',
-  bungalo: 'бунгало'
+  bungalo: 'бунгало',
+};
+
+var accomodationMinPrice = {
+  palace: 10000,
+  flat: 1000,
+  house: 5000,
+  bungalo: 0,
 };
 
 var map = document.querySelector('.map');
@@ -152,7 +161,7 @@ var createInfoCard = function (listing) {
   }
   avatar.src = listing.author.avatar;
 
-  type.textContent = listingType[listing.offer.type];
+  type.textContent = accomodationType[listing.offer.type];
 
   if (!listing.offer.features || listing.offer.features.length === 0) {
     featuresList.remove();
@@ -184,8 +193,6 @@ var createInfoCard = function (listing) {
   return card;
 };
 
-map.insertBefore(createInfoCard(similarListings[1]), map.querySelector('.map__filters-container'));
-
 // отключение полей формы
 var adForm = document.querySelector('.ad-form');
 var adFormElementFieldsets = adForm.querySelectorAll('.ad-form__element');
@@ -213,6 +220,7 @@ var setBookingActiveState = function () {
   adFormHeaderFieldset.removeAttribute('disabled', 'disabled');
 };
 
+// валидация формы
 // заполнение поля адреса
 var setPinAddress = function () {
   var locationX = mapMainPin.offsetLeft + MAIN_PIN_WIDTH / 2;
@@ -247,21 +255,27 @@ mapMainPin.addEventListener('mousedown', function (evt) {
 });
 
 mapMainPin.addEventListener('keydown', function (evt) {
-  if (evt.key === 'Enter') {
+  if (evt.key === ENTER_KEY) {
     setBookingActiveState();
     setPinAddress();
   }
 });
 
 // установка соответствия количества гостей (спальных мест) с количеством комнат
+var roomsAmountErrorMessages = {
+  1: '1 комната — «для 1 гостя»',
+  2: '2 комнаты — «для 2 гостей» или «для 1 гостя»',
+  3: '3 комнаты — «для 3 гостей», «для 2 гостей» или «для 1 гостя»',
+  100: '100 комнат — «не для гостей»'
+};
 var amountOfGuestsInput = adForm.querySelector('select[name="capacity"]');
 var amountOfRoomsInput = adForm.querySelector('select[name="rooms"]');
 
 var checkRoomsValidity = function () {
-  if ((amountOfGuestsInput.value <= amountOfRoomsInput.value && amountOfGuestsInput.value > 0) || (amountOfGuestsInput.value === 0 && amountOfRoomsInput.value === 100)) {
+  if (amountOfGuestsInput.value === amountOfRoomsInput.value) {
     amountOfGuestsInput.setCustomValidity('');
   } else {
-    amountOfGuestsInput.setCustomValidity('Поле заполнено неверно');
+    amountOfGuestsInput.setCustomValidity(roomsAmountErrorMessages[amountOfRoomsInput.value]);
   }
 };
 
@@ -271,48 +285,70 @@ amountOfGuestsInput.addEventListener('change', function () {
   checkRoomsValidity();
 });
 
-adForm.addEventListener('submit', function (evt) {
-  if (!adForm.checkValidity()) {
-    evt.preventDefault();
-    return;
-  }
+// поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
+var priceField = adForm.querySelector('input[name="price"]');
+var accomodationTypeField = adForm.querySelector('select[name="type"]');
+
+accomodationTypeField.addEventListener('change', function () {
+  priceField.placeholder = accomodationMinPrice[accomodationTypeField.value];
+});
+
+// синхронизация полей «Время заезда» и «Время выезда»
+var checkinTime = adForm.querySelector('select[name="timein"]');
+var checkoutTime = adForm.querySelector('select[name="timeout"]');
+
+checkinTime.addEventListener('change', function () {
+  checkoutTime.value = checkinTime.value;
 });
 
 // показ карточки при клике на пин
-// var filtersContainer = map.querySelector('.map__filters-container');
-// var cardCloseButton = map.querySelector('.popup__close');
+var filtersContainer = map.querySelector('.map__filters-container');
 
-// var openListingCard = function (target, listings) {
-//   var pinImg = target;
-//   if (!target.alt) {
-//     var pinImg = target.children[0];;
-//   }
+var listingCardCloseButtonHandler = function () {
+  closeListingCard();
+};
 
-//   for (var i = 0; i < listings.length; i += 1) {
-//     if (pinImg.alt === listings[i].offer.title && pinImg.alt !== 'Метка объявления') {
-//       map.insertBefore(createInfoCard(listings[i]), filtersContainer);
-//     }
-//   }
-// };
+var listingCardEcsPressHandler = function (evt) {
+  if (evt.key === ESC_KEY) {
+    closeListingCard();
+  }
+};
 
-// var closeListingCard = function (target, listings) {
-//   for (var i = 0; i < listings.length; i += 1) {
-//     if (pinImg.alt === listings[i].offer.title) {
-//       map.remove(listings[i]);
-//     }
-//   }
-// };
+var openListingCard = function (target, listings) {
+  closeListingCard();
 
-// mapPinsList.addEventListener('click', function (evt) {
-//   openListingCard(evt.target, similarListings);
-// });
+  var pinImg = target;
 
-// mapPinsList.addEventListener('keydown', function (evt) {
-//   if (evt.key === 'Enter') {
-//     openListingCard(evt.target, similarListings);
-//   }
-// });
+  for (i = 0; i < listings.length; i += 1) {
+    if (pinImg.alt === listings[i].offer.title) {
+      map.insertBefore(createInfoCard(listings[i]), filtersContainer);
+    }
+  }
 
-// cardCloseButton.addEventListener('click', function (evt) {
-//   closeListingCard();
-// });
+  var card = map.querySelector('.map__card');
+  card.addEventListener('click', listingCardCloseButtonHandler);
+  document.addEventListener('keydown', listingCardEcsPressHandler);
+};
+
+var closeListingCard = function () {
+  var card = map.querySelector('.map__card');
+  if (card) {
+    card.remove();
+    card.removeEventListener('click', listingCardCloseButtonHandler);
+    document.removeEventListener('keydown', listingCardEcsPressHandler);
+  }
+};
+
+mapPinsList.addEventListener('click', function (evt) {
+  var pinImageElement = evt.target;
+  if (pinImageElement.alt && pinImageElement.alt !== 'Метка объявления') {
+    openListingCard(pinImageElement, similarListings);
+  }
+});
+
+mapPinsList.addEventListener('keydown', function (evt) {
+  var pinImageElement = evt.target.firstElementChild;
+  if (evt.key === ENTER_KEY && pinImageElement.alt !== 'Метка объявления') {
+    openListingCard(pinImageElement, similarListings);
+  }
+});
