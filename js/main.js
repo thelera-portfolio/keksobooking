@@ -19,18 +19,23 @@ var Y_MAX = 630;
 var ESC_KEY = 'Escape';
 var ENTER_KEY = 'Enter';
 
-var accomodationType = {
-  palace: 'дворец',
-  flat: 'квартира',
-  house: 'дом',
-  bungalo: 'бунгало',
-};
-
-var accomodationMinPrice = {
-  palace: 10000,
-  flat: 1000,
-  house: 5000,
-  bungalo: 0,
+var accomodationSettings = {
+  palace: {
+    label: 'дворец',
+    price: 10000
+  },
+  flat: {
+    label: 'квартира',
+    price: 1000
+  },
+  house: {
+    label: 'дом',
+    price: 5000
+  },
+  bungalo: {
+    label: 'бунгало',
+    price: 0
+  }
 };
 
 var map = document.querySelector('.map');
@@ -63,6 +68,7 @@ var createListing = function (amountOfListings) {
     var locationY = generateNumber(Y_MIN, Y_MAX);
 
     listings.push({
+      id: i,
       author: {
         avatar: 'img/avatars/user0' + (i + 1) + '.png',
       },
@@ -97,6 +103,7 @@ var createPin = function (listing) {
   var mapPinImage = mapPin.querySelector('img');
 
   mapPin.style = 'left: ' + (listing.offer.location.x - X_OFFSET) + 'px; top: ' + (listing.offer.location.y - Y_OFFSET) + 'px';
+  mapPin.dataset.id = listing.id;
   mapPinImage.src = listing.author.avatar;
   mapPinImage.alt = listing.offer.title;
 
@@ -161,7 +168,7 @@ var createInfoCard = function (listing) {
   }
   avatar.src = listing.author.avatar;
 
-  type.textContent = accomodationType[listing.offer.type];
+  type.textContent = accomodationSettings[listing.offer.type].label;
 
   if (!listing.offer.features || listing.offer.features.length === 0) {
     featuresList.remove();
@@ -250,6 +257,7 @@ var setPinAddress = function () {
 };
 
 setPinAddress();
+
 mapMainPin.addEventListener('mousedown', function (evt) {
   if (evt.button === 0) {
     setBookingActiveState();
@@ -271,6 +279,7 @@ var roomsAmountErrorMessages = {
   3: '3 комнаты — «для 3 гостей», «для 2 гостей» или «для 1 гостя»',
   100: '100 комнат — «не для гостей»'
 };
+
 var amountOfGuestsInput = adForm.querySelector('select[name="capacity"]');
 var amountOfRoomsInput = adForm.querySelector('select[name="rooms"]');
 
@@ -293,7 +302,7 @@ var priceField = adForm.querySelector('input[name="price"]');
 var accomodationTypeField = adForm.querySelector('select[name="type"]');
 
 accomodationTypeField.addEventListener('change', function () {
-  priceField.placeholder = accomodationMinPrice[accomodationTypeField.value];
+  priceField.placeholder = accomodationSettings[accomodationTypeField.value].price;
 });
 
 // синхронизация полей «Время заезда» и «Время выезда»
@@ -320,13 +329,12 @@ var listingCardEcsPressHandler = function (evt) {
 var openListingCard = function (target, listings) {
   closeListingCard();
 
-  var pinImg = target;
+  var id = Number(target.dataset.id);
+  var targetListing = listings.find(function (offer) {
+    return offer.id === id;
+  });
 
-  for (i = 0; i < listings.length; i += 1) {
-    if (pinImg.alt === listings[i].offer.title) {
-      map.insertBefore(createInfoCard(listings[i]), filtersContainer);
-    }
-  }
+  map.insertBefore(createInfoCard(targetListing), filtersContainer);
 
   var card = map.querySelector('.map__card');
   card.addEventListener('click', listingCardCloseButtonHandler);
@@ -343,14 +351,26 @@ var closeListingCard = function () {
 };
 
 mapPinsList.addEventListener('click', function (evt) {
-  if (evt.target.alt) {
-    openListingCard(evt.target, similarListings);
+  if (evt.target.classList.contains('map__pin')) {
+    var clickedPin = evt.target;
+  } else if (evt.target.parentElement.classList.contains('map__pin')) {
+    clickedPin = evt.target.parentElement;
+  }
+
+  if (clickedPin) {
+    openListingCard(clickedPin, similarListings);
   }
 });
 
 mapPinsList.addEventListener('keydown', function (evt) {
-  if (evt.key === ENTER_KEY) {
-    openListingCard(evt.target.firstElementChild, similarListings);
+  if (evt.target.classList.contains('map__pin')) {
+    var clickedPin = evt.target;
+  } else if (evt.target.parentElement.classList.contains('map__pin')) {
+    clickedPin = evt.target.parentElement;
+  }
+
+  if (evt.key === ENTER_KEY && clickedPin) {
+    openListingCard(clickedPin, similarListings);
   }
 });
 
