@@ -22,6 +22,7 @@
   };
   var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 
+  // карточка объявления
   window.card = {
     create: function (listing) {
       var card = cardTemplate.cloneNode(true);
