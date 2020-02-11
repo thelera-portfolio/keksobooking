@@ -13,22 +13,23 @@
   //var similarListings = window.data.createListing(AMOUNT_OF_LISTINGS);
   var similarListings;
 
-  var loadHandler = function (listings) {
-    similarListings = listings;
-    console.log(similarListings);
+  var successHandler = function (listings) {
+    window.similarListings = listings;
+    console.log(window.similarListings);
   };
 
   var errorHandler = function (error) {
     console.log(error);
   };
 
-  window.backend.load(loadHandler, errorHandler);
-
   var isActive = false;
 
   var mapActivation = {
     enable: function () {
       isActive = true;
+
+      window.backend.load(successHandler, errorHandler);
+      console.log(window.similarListings);
 
       if (mapPinsList.children.length < similarListings.length) {
         mapPinsList.appendChild(window.pin.createList(similarListings));

@@ -11,7 +11,7 @@
     var mapPin = pinTemplate.cloneNode(true);
     var mapPinImage = mapPin.querySelector('img');
 
-    mapPin.style = 'left: ' + (listing.offer.location.x - X_OFFSET) + 'px; top: ' + (listing.offer.location.y - PIN_HEIGHT) + 'px';
+    mapPin.style = 'left: ' + (listing.location.x - X_OFFSET) + 'px; top: ' + (listing.location.y - PIN_HEIGHT) + 'px';
     mapPin.dataset.id = listing.id;
     mapPinImage.src = listing.author.avatar;
     mapPinImage.alt = listing.offer.title;

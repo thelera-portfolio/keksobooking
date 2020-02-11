@@ -1,57 +1,66 @@
 'use strict';
 
 (function () {
-  var statusCode = {
-    OK: 200,
-    BAD_REQUEST: 400,
-    UNAUTHORIZED: 401,
-    NOT_FOUND: 404
+  var status = {
+    OK: { code: 200 },
+    BAD_REQUEST: { code: 400, errorMessage: 'Неверный запрос' },
+    UNAUTHORIZED: { code: 401, errorMessage: 'Пользователь не авторизован' },
+    NOT_FOUND: { code: 404, errorMessage: 'Ничего не найдено' },
+    DEFAULT: { errorMessage: 'Статус ответа: ' }
   };
-  var TIMEOUT_IN_MS = 10000;
+  var TIMEOUT = 10000;// 10 sec
   var URL_LOAD = ' https://js.dump.academy/keksobooking/data';
   var URL_UPLOAD = 'https://js.dump.academy/code-and-magick/';
+  var GET_METHOD = 'GET';
+  var POST_METHOD = 'POST';
+
+  var createRequest = function (successHandler, errorHandler) {
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'json';
+
+    xhr.addEventListener('load', function () {
+      var error;
+
+      switch (xhr.status) {
+        case status.OK.code:
+          successHandler(xhr.response);
+          break;
+        case status.BAD_REQUEST.code:
+          error = status.BAD_REQUEST.errorMessage;
+          break;
+        case status.UNAUTHORIZED.code:
+          error = status.UNAUTHORIZED.errorMessage;
+          break;
+        case status.NOT_FOUND.code:
+          error = status.NOT_FOUND.errorMessage;
+          break;
+        default:
+          error = status.DEFAULT.errorMessage + xhr.status + ' ' + xhr.statusText;
+      }
+
+      if (error) {
+        errorHandler(error);
+      }
+    });
+
+    xhr.addEventListener('error', function () {
+      errorHandler('Произошла ошибка соединения');
+    });
+
+    xhr.addEventListener('timeout', function () {
+      errorHandler('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
+    });
+
+    xhr.timeout = TIMEOUT;
+
+    return xhr;
+  };
 
   window.backend = {
-    load: function (loadHandler, errorHandler) {
-      var xhr = new XMLHttpRequest();
-      xhr.responseType = 'json';
+    load: function (successHandler, errorHandler) {
+      var xhr = createRequest(successHandler, errorHandler);
 
-      xhr.addEventListener('load', function () {
-        var error;
-
-        switch (xhr.status) {
-          case statusCode.OK:
-            loadHandler(xhr.response);
-            break;
-          case statusCode.BAD_REQUEST:
-            error = 'Неверный запрос';
-            break;
-          case statusCode.UNAUTHORIZED:
-            error = 'Пользователь не авторизован';
-            break;
-          case statusCode.NOT_FOUND:
-            error = 'Ничего не найдено';
-            break;
-          default:
-            error = 'Статус ответа: ' + xhr.status + ' ' + xhr.statusText;
-        }
-
-        if (error) {
-          errorHandler(error);
-        }
-      });
-
-      xhr.addEventListener('error', function () {
-        errorHandler('Произошла ошибка соединения');
-      });
-
-      xhr.addEventListener('timeout', function () {
-        errorHandler('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
-      });
-
-      xhr.timeout = TIMEOUT_IN_MS;// 10 sec
-
-      xhr.open('GET', URL_LOAD);
+      xhr.open(GET_METHOD, URL_LOAD);
       xhr.send();
     },
     save: function () {
