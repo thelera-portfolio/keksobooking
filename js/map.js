@@ -10,7 +10,17 @@
   var mapMainPin = map.querySelector('.map__pin--main');
   var mapFilters = map.querySelector('.map__filters');
   var filtersContainer = map.querySelector('.map__filters-container');
-  var similarListings = window.data.createListing(AMOUNT_OF_LISTINGS);
+  //var similarListings = window.data.createListing(AMOUNT_OF_LISTINGS);
+  var similarListings;
+
+  var successHandler = function (listings) {
+    window.similarListings = listings;
+    console.log(window.similarListings);
+  };
+
+  var errorHandler = function (error) {
+    console.log(error);
+  };
 
   var isActive = false;
 
@@ -18,8 +28,12 @@
     enable: function () {
       isActive = true;
 
+      window.backend.load(successHandler, errorHandler);
+      console.log(window.similarListings);
+
       if (mapPinsList.children.length < similarListings.length) {
         mapPinsList.appendChild(window.pin.createList(similarListings));
+
       }
 
       map.classList.remove('map--faded');
@@ -78,13 +92,13 @@
     map.insertBefore(window.card.create(targetListing), filtersContainer);
 
     var card = map.querySelector('.map__card');
+    var cardCloseButton = card.querySelector('.popup__close');
     card.dataset.id = id;
-    card.addEventListener('click', listingCardCloseButtonHandler);
+    cardCloseButton.addEventListener('click', listingCardCloseButtonHandler);
     document.addEventListener('keydown', listingCardEcsPressHandler);
   };
 
   var closeListingCard = function () {
-
     var card = map.querySelector('.map__card');
     if (card) {
       card.remove();
@@ -92,8 +106,9 @@
       document.removeEventListener('keydown', listingCardEcsPressHandler);
     }
   };
+
   var isSamePinClicked = function (card, pin) {
-    return (card && card.dataset.id === pin.dataset.id) ? true : false;
+    return (card && card.dataset.id === pin.dataset.id);
   };
 
   mapPinsList.addEventListener('click', function (evt) {
