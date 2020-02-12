@@ -24,7 +24,7 @@
 
   // карточка объявления
   window.card = {
-    create: function (listing) {
+    create: function (cardData) {
       var card = cardTemplate.cloneNode(true);
       var title = card.querySelector('.popup__title');
       var address = card.querySelector('.popup__text--address');
@@ -39,48 +39,48 @@
       var photo = photosList.querySelector('.popup__photo');
       var avatar = card.querySelector('.popup__avatar');
 
-      title.textContent = listing.offer.title;
+      title.textContent = cardData.offer.title;
 
-      if (listing.offer.address) {
+      if (cardData.offer.address) {
         address.remove();
       }
-      address.textContent = listing.offer.address;
+      address.textContent = cardData.offer.address;
 
-      if (!listing.offer.price) {
+      if (!cardData.offer.price) {
         price.remove();
       }
-      price.textContent = listing.offer.price + '₽/ночь';
+      price.textContent = cardData.offer.price + '₽/ночь';
 
-      if (!listing.offer.rooms || !listing.offer.guests) {
+      if (!cardData.offer.rooms || !cardData.offer.guests) {
         capacity.remove();
       }
-      capacity.textContent = listing.offer.rooms + ' комнаты для ' + listing.offer.guests + ' гостей';
+      capacity.textContent = cardData.offer.rooms + ' комнаты для ' + cardData.offer.guests + ' гостей';
 
-      if (!listing.offer.checkin || !listing.offer.checkout) {
+      if (!cardData.offer.checkin || !cardData.offer.checkout) {
         visitTime.remove();
       }
-      visitTime.textContent = 'Заезд после ' + listing.offer.checkin + ', выезд до ' + listing.offer.checkout;
+      visitTime.textContent = 'Заезд после ' + cardData.offer.checkin + ', выезд до ' + cardData.offer.checkout;
 
-      if (!listing.offer.description) {
+      if (!cardData.offer.description) {
         description.remove();
       }
-      description.textContent = listing.offer.description;
+      description.textContent = cardData.offer.description;
 
-      if (!listing.author.avatar) {
+      if (!cardData.author.avatar) {
         avatar.remove();
       }
-      avatar.src = listing.author.avatar;
+      avatar.src = cardData.author.avatar;
 
-      type.textContent = ACCOMODATION_SETTINGS[listing.offer.type].label;
+      type.textContent = ACCOMODATION_SETTINGS[cardData.offer.type].label;
 
-      if (!listing.offer.features || listing.offer.features.length === 0) {
+      if (!cardData.offer.features || cardData.offer.features.length === 0) {
         featuresList.remove();
       }
       // удаляем из склонированного шаблона удобства, которых нет в данной карточке
       for (var i = 0; i < FEATURES.length; i++) {
         var count = 0;
-        for (var j = 0; j < listing.offer.features.length; j++) {
-          if (FEATURES[i] === listing.offer.features[j]) {
+        for (var j = 0; j < cardData.offer.features.length; j++) {
+          if (FEATURES[i] === cardData.offer.features[j]) {
             count += 1;
           }
         }
@@ -89,15 +89,15 @@
         }
       }
 
-      if (!listing.offer.photos || listing.offer.photos.length === 0) {
+      if (!cardData.offer.photos || cardData.offer.photos.length === 0) {
         photosList.remove();
       }
 
-      photo.src = listing.offer.photos[0];
-      for (var k = 1; k < listing.offer.photos.length; k++) {
+      photo.src = cardData.offer.photos[0];
+      for (var k = 1; k < cardData.offer.photos.length; k++) {
         var newPhoto = photo.cloneNode();
         photosList.appendChild(newPhoto);
-        newPhoto.src = listing.offer.photos[k];
+        newPhoto.src = cardData.offer.photos[k];
       }
 
       return card;
