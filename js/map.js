@@ -3,107 +3,109 @@
 (function () {
   var ESC_KEY = 'Escape';
   var ENTER_KEY = 'Enter';
-  var AMOUNT_OF_LISTINGS = 8;
 
   var map = document.querySelector('.map');
   var mapPinsList = map.querySelector('.map__pins');
   var mapMainPin = map.querySelector('.map__pin--main');
   var mapFilters = map.querySelector('.map__filters');
   var filtersContainer = map.querySelector('.map__filters-container');
-  //var similarListings = window.data.createListing(AMOUNT_OF_LISTINGS);
-  var similarListings;
+  var similarOffers;
+  var startLocation;
 
-  var successHandler = function (listings) {
-    window.similarListings = listings;
-    console.log(window.similarListings);
-  };
+  // в случае успешной загрузки данных с сервера
+  var successHandler = function (offerData) {
+    similarOffers = offerData;
 
-  var errorHandler = function (error) {
-    console.log(error);
-  };
+    for (var i = 0; i < similarOffers.length; i++) {
+      similarOffers[i].id = i;
+    }
 
-  var isActive = false;
+    // переход в активный режим
+    window.map.activation.enable();
+    window.form.enable();
+    window.address.set();
 
-  var mapActivation = {
-    enable: function () {
-      isActive = true;
-
-      window.backend.load(successHandler, errorHandler);
-      console.log(window.similarListings);
-
-      if (mapPinsList.children.length < similarListings.length) {
-        mapPinsList.appendChild(window.pin.createList(similarListings));
-
+    // показ карточки при клике на пин
+    mapPinsList.addEventListener('click', function (evt) {
+      if (evt.target.classList.contains('map__pin')) {
+        var clickedPin = evt.target;
+      } else if (evt.target.parentElement.classList.contains('map__pin')) {
+        clickedPin = evt.target.parentElement;
       }
 
-      map.classList.remove('map--faded');
+      var previousCard = map.querySelector('.map__card');
+      if (clickedPin && !isSamePinClicked(previousCard, clickedPin)) {
+        openOfferCard(clickedPin, similarOffers);
+      }
+    });
 
-      mapFilters.classList.remove('map__filters--disabled');
-    },
-    disable: function () {
-      for (var i = 0; i < mapPinsList.children.length; i++) {
-        mapPinsList.removeChild(mapPinsList.children[0]);
+    mapPinsList.addEventListener('keydown', function (evt) {
+      if (evt.target.classList.contains('map__pin')) {
+        var clickedPin = evt.target;
+      } else if (evt.target.parentElement.classList.contains('map__pin')) {
+        clickedPin = evt.target.parentElement;
       }
 
-      map.classList.add('map--faded');
+      var previousCard = map.querySelector('.map__card');
+      if (evt.key === ENTER_KEY && !isSamePinClicked(previousCard, clickedPin)) {
+        openOfferCard(clickedPin, similarOffers);
+      }
+    });
 
-      mapFilters.classList.add('map__filters--disabled');
-    }
+    mapMainPin.addEventListener('keydown', function (evt) {
+      evt.stopPropagation();
+    });
+
+    mapMainPin.addEventListener('click', function (evt) {
+      evt.stopPropagation();
+    });
   };
 
-  window.address.set();
+  var errorHandler = function (errorMessage) {
+    var errorPopup = document.createElement('div');
+    errorPopup.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    errorPopup.style.position = 'absolute';
+    errorPopup.style.left = 0;
+    errorPopup.style.right = 0;
+    errorPopup.style.fontSize = '30px';
 
-  // переход в активный режим при клике на пин
-  mapMainPin.addEventListener('mousedown', function (evt) {
-    if (evt.button === 0 && !isActive) {
-      mapActivation.enable();
-      window.form.enable();
-      window.address.set();
-    }
-  });
-
-  mapMainPin.addEventListener('keydown', function (evt) {
-    if (evt.key === ENTER_KEY && !isActive) {
-      mapActivation.enable();
-      window.form.enable();
-      window.address.set();
-    }
-  });
-
-  // показ карточки при клике на пин
-  var listingCardCloseButtonHandler = function () {
-    closeListingCard();
+    errorPopup.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', errorPopup);
   };
 
-  var listingCardEcsPressHandler = function (evt) {
+  var offerCardCloseButtonHandler = function () {
+    closeOfferCard();
+  };
+
+  var offerCardEcsPressHandler = function (evt) {
     if (evt.key === ESC_KEY) {
-      closeListingCard();
+      closeOfferCard();
     }
   };
 
-  var openListingCard = function (target, listings) {
-    closeListingCard();
+  var openOfferCard = function (target, offerData) {
+    closeOfferCard();
 
     var id = Number(target.dataset.id);
-    var targetListing = listings.find(function (offer) {
+    var targetOffer = offerData.find(function (offer) {
       return offer.id === id;
     });
 
-    map.insertBefore(window.card.create(targetListing), filtersContainer);
+    map.insertBefore(window.card.create(targetOffer), filtersContainer);
 
     var card = map.querySelector('.map__card');
     var cardCloseButton = card.querySelector('.popup__close');
     card.dataset.id = id;
-    cardCloseButton.addEventListener('click', listingCardCloseButtonHandler);
-    document.addEventListener('keydown', listingCardEcsPressHandler);
+    cardCloseButton.addEventListener('click', offerCardCloseButtonHandler);
+    document.addEventListener('keydown', offerCardEcsPressHandler);
   };
 
-  var closeListingCard = function () {
+  var closeOfferCard = function () {
     var card = map.querySelector('.map__card');
     if (card) {
       card.remove();
-      card.removeEventListener('click', listingCardCloseButtonHandler);
-      document.removeEventListener('keydown', listingCardEcsPressHandler);
+      card.removeEventListener('click', offerCardCloseButtonHandler);
+      document.removeEventListener('keydown', offerCardEcsPressHandler);
     }
   };
 
@@ -111,37 +113,52 @@
     return (card && card.dataset.id === pin.dataset.id);
   };
 
-  mapPinsList.addEventListener('click', function (evt) {
-    if (evt.target.classList.contains('map__pin')) {
-      var clickedPin = evt.target;
-    } else if (evt.target.parentElement.classList.contains('map__pin')) {
-      clickedPin = evt.target.parentElement;
-    }
+  var isActive = false;
 
-    var previousCard = map.querySelector('.map__card');
-    if (clickedPin && !isSamePinClicked(previousCard, clickedPin)) {
-      openListingCard(clickedPin, similarListings);
-    }
-  });
+  window.map = {
+    activation: {
+      enable: function () {
+        isActive = true;
 
-  mapPinsList.addEventListener('keydown', function (evt) {
-    if (evt.target.classList.contains('map__pin')) {
-      var clickedPin = evt.target;
-    } else if (evt.target.parentElement.classList.contains('map__pin')) {
-      clickedPin = evt.target.parentElement;
-    }
+        if (mapPinsList.children.length < similarOffers.length) {
+          mapPinsList.appendChild(window.pin.createList(similarOffers));
+        }
 
-    var previousCard = map.querySelector('.map__card');
-    if (evt.key === ENTER_KEY && !isSamePinClicked(previousCard, clickedPin)) {
-      openListingCard(clickedPin, similarListings);
+        map.classList.remove('map--faded');
+
+        mapFilters.classList.remove('map__filters--disabled');
+      },
+      disable: function () {
+        for (var i = mapPinsList.children.length - 1; i > 0; i--) {
+          if (!mapPinsList.children[i].classList.contains('map__pin--main')) {
+            mapPinsList.removeChild(mapPinsList.children[i]);
+          }
+        }
+
+        map.classList.add('map--faded');
+
+        mapFilters.classList.add('map__filters--disabled');
+
+        window.address.setStartLocation(startLocation);
+
+        isActive = false;
+      }
+    }
+  };
+
+  window.address.set();
+
+  // загружаем данные с сервера при клике на главный пин
+  startLocation = window.address.getStartLocation();
+  mapMainPin.addEventListener('mousedown', function (evt) {
+    if (evt.button === 0 && !isActive) {
+      window.backend.load(successHandler, errorHandler);
     }
   });
 
   mapMainPin.addEventListener('keydown', function (evt) {
-    evt.stopPropagation();
-  });
-
-  mapMainPin.addEventListener('click', function (evt) {
-    evt.stopPropagation();
+    if (evt.key === ENTER_KEY && !isActive) {
+      window.backend.load(successHandler, errorHandler);
+    }
   });
 })();

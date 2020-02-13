@@ -2,15 +2,17 @@
 
 (function () {
   var status = {
-    OK: { code: 200 },
-    BAD_REQUEST: { code: 400, errorMessage: 'Неверный запрос' },
-    UNAUTHORIZED: { code: 401, errorMessage: 'Пользователь не авторизован' },
-    NOT_FOUND: { code: 404, errorMessage: 'Ничего не найдено' },
-    DEFAULT: { errorMessage: 'Статус ответа: ' }
+    OK: {code: 200},
+    BAD_REQUEST: {code: 400, errorMessage: 'Неверный запрос'},
+    UNAUTHORIZED: {code: 401, errorMessage: 'Пользователь не авторизован'},
+    NOT_FOUND: {code: 404, errorMessage: 'Ничего не найдено'},
+    DEFAULT: {errorMessage: 'Статус ответа: '}
   };
+  var CONNECTION_ERROR = 'Произошла ошибка соединения';
+  var TIMEOUT_ERROR = 'Запрос не успел выполниться за ';
   var TIMEOUT = 10000;// 10 sec
   var URL_LOAD = ' https://js.dump.academy/keksobooking/data';
-  var URL_UPLOAD = 'https://js.dump.academy/code-and-magick/';
+  var URL_UPLOAD = 'https://js.dump.academy/keksobooking';
   var GET_METHOD = 'GET';
   var POST_METHOD = 'POST';
 
@@ -44,11 +46,11 @@
     });
 
     xhr.addEventListener('error', function () {
-      errorHandler('Произошла ошибка соединения');
+      errorHandler(CONNECTION_ERROR);
     });
 
     xhr.addEventListener('timeout', function () {
-      errorHandler('Запрос не успел выполниться за ' + xhr.timeout + ' мс');
+      errorHandler(TIMEOUT_ERROR + xhr.timeout + ' мс');
     });
 
     xhr.timeout = TIMEOUT;
@@ -63,8 +65,11 @@
       xhr.open(GET_METHOD, URL_LOAD);
       xhr.send();
     },
-    save: function () {
+    save: function (successHandler, errorHandler, data) {
+      var xhr = createRequest(successHandler, errorHandler);
 
+      xhr.open(POST_METHOD, URL_UPLOAD);
+      xhr.send(data);
     }
-  }
+  };
 })();
