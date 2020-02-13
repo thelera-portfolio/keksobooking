@@ -38,6 +38,19 @@
       } else {
         adFormAddressFiels.value = locationX + ', ' + locationY;
       }
+    },
+    getStartLocation: function () {
+      var location = {};
+      location.x = mapMainPin.offsetLeft + X_OFFSET_MAIN_PIN;
+      location.y = mapMainPin.offsetTop + (MAIN_PIN_HEIGHT - MAIN_PIN_TAIL_HEIGHT) / 2;
+      location.left = mapMainPin.style.left;
+      location.top = mapMainPin.style.top;
+      return location;
+    },
+    setStartLocation: function (location) {
+      mapMainPin.style.left = location.left;
+      mapMainPin.style.top = location.top;
+      adFormAddressFiels.value = location.x + ', ' + location.y;
     }
   };
 })();

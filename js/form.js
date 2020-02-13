@@ -19,10 +19,21 @@
       price: 0
     }
   };
+  var ESC_KEY = 'Escape';
+  var ERROR_MESSAGE = 'Ошибка загрузки объявления. ';
 
   var adForm = document.querySelector('.ad-form');
   var adFormElementFieldsets = adForm.querySelectorAll('.ad-form__element');
   var adFormHeaderFieldset = adForm.querySelector('.ad-form-header');
+  var main = document.querySelector('main');
+
+  var successAnswerTemplate = document.querySelector('#success').content.querySelector('.success');
+  var successAnswerPopup = successAnswerTemplate.cloneNode(true);
+
+  var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+  var errorPopup = errorTemplate.cloneNode(true);
+  var errorMessage = errorPopup.querySelector('.error__message');
+  var errorPopupCloseButton = errorTemplate.querySelector('.error__button');
 
   // отключение полей формы
   for (var i = 0; i < adFormElementFieldsets.length; i++) {
@@ -79,8 +90,64 @@
     disable: function () {
       adForm.classList.add('ad-form--disabled');
       for (var k = 0; k < adFormElementFieldsets.length; k++) {
+        adForm.reset();
         adFormElementFieldsets[k].setAttribute('disabled', 'disabled');
       } adFormHeaderFieldset.setAttribute('disabled', 'disabled');
     }
   };
+
+  var successAnswerPopupClickHandler = function () {
+    successAnswerPopup.parentNode.removeChild(successAnswerPopup);
+    document.removeEventListener('click', successAnswerPopupClickHandler);
+  };
+
+  var successAnswerPopupEscButtonHandler = function (evt) {
+    if (evt.key === ESC_KEY) {
+      successAnswerPopup.parentNode.removeChild(successAnswerPopup);
+      document.removeEventListener('keydown', successAnswerPopupEscButtonHandler);
+    }
+  };
+
+  var errorPopupClickHandler = function () {
+    errorPopup.parentNode.removeChild(errorPopup);
+    document.removeEventListener('click', errorPopupClickHandler);
+  };
+
+  var errorPopupEscButtonHandler = function (evt) {
+    if (evt.key === ESC_KEY) {
+      errorPopup.parentNode.removeChild(errorPopup);
+      document.removeEventListener('keydown', errorPopupEscButtonHandler);
+    }
+  };
+
+  var errorPopupCloseButtonHandler = function () {
+    errorPopup.parentNode.removeChild(errorPopup);
+    document.removeEventListener('click', errorPopupClickHandler);
+  };
+
+  var succeessHandler = function () {
+    window.form.disable();
+    window.map.activation.disable();
+
+    main.appendChild(successAnswerPopup);
+
+    document.addEventListener('click', successAnswerPopupClickHandler);
+    document.addEventListener('keydown', successAnswerPopupEscButtonHandler);
+  };
+
+  var errorHandler = function (message) {
+    errorMessage.textContent = ERROR_MESSAGE + message;
+    main.appendChild(errorPopup);
+
+    document.addEventListener('click', errorPopupClickHandler);
+    document.addEventListener('keydown', errorPopupEscButtonHandler);
+    errorPopupCloseButton.addEventListener('click', errorPopupCloseButtonHandler);
+  };
+
+  // отправка данных на сервер с помощью AJAX
+  adForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+
+    window.backend.save(succeessHandler, errorHandler, new FormData(adForm));
+  });
 })();
