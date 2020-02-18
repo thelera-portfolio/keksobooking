@@ -7,6 +7,7 @@
   var mapPinsList = map.querySelector('.map__pins');
   var mapMainPin = map.querySelector('.map__pin--main');
   var mapFilters = map.querySelector('.map__filters');
+  var filters = document.querySelector('.map__filters');
   var similarOffers;
   var reducedOffers;
   var startLocation;
@@ -19,15 +20,18 @@
       similarOffers[i].id = i;
     }
 
-    window.filter.type(similarOffers);
     reducedOffers = window.filter.amount(similarOffers, window.map.PIN_AMOUNT);
-
 
     // переход в активный режим
     window.map.activation.enable();
     window.form.enable();
     window.address.set();
   };
+
+  // фильтрация объявлений
+  filters.addEventListener('change', function () {
+    window.filter.set(similarOffers);
+  });
 
   // показ карточки при клике на пин
   mapPinsList.addEventListener('click', function (evt) {
