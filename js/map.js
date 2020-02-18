@@ -30,7 +30,9 @@
 
   // фильтрация объявлений
   filters.addEventListener('change', function () {
-    window.filter.set(similarOffers);
+    window.debounce(function () {
+      window.filter.set(similarOffers);
+    });
   });
 
   // показ карточки при клике на пин
