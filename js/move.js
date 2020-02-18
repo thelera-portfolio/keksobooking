@@ -8,7 +8,7 @@
   var Y_MAX = 630;
 
   var map = document.querySelector('.map');
-  var mapMainPin = map.querySelector('.map__pin--main');
+  var mapMainPin = document.querySelector('.map__pin--main');
   var mapWidth = map.clientWidth;
 
   // перемещение главной метки
@@ -20,7 +20,7 @@
       y: evt.clientY
     };
 
-    var mouseMoveHandle = function (evtMove) {
+    var mouseMoveHandler = function (evtMove) {
       evtMove.preventDefault();
 
       var shift = {
@@ -56,14 +56,14 @@
       }
     };
 
-    var mouseUpHandle = function (evtUp) {
+    var mouseUpHandler = function (evtUp) {
       evtUp.preventDefault();
 
-      document.removeEventListener('mousemove', mouseMoveHandle);
-      document.removeEventListener('mouseup', mouseUpHandle);
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
     };
 
-    document.addEventListener('mousemove', mouseMoveHandle);
-    document.addEventListener('mouseup', mouseUpHandle);
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
   });
 })();

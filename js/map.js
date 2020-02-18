@@ -1,15 +1,15 @@
 'use strict';
 
 (function () {
-  var ESC_KEY = 'Escape';
   var ENTER_KEY = 'Enter';
 
   var map = document.querySelector('.map');
   var mapPinsList = map.querySelector('.map__pins');
   var mapMainPin = map.querySelector('.map__pin--main');
   var mapFilters = map.querySelector('.map__filters');
-  var filtersContainer = map.querySelector('.map__filters-container');
+  var filters = document.querySelector('.map__filters');
   var similarOffers;
+  var reducedOffers;
   var startLocation;
 
   // в случае успешной загрузки данных с сервера
@@ -20,46 +20,55 @@
       similarOffers[i].id = i;
     }
 
+    reducedOffers = window.filter.amount(similarOffers, window.map.PIN_AMOUNT);
+
     // переход в активный режим
     window.map.activation.enable();
     window.form.enable();
     window.address.set();
-
-    // показ карточки при клике на пин
-    mapPinsList.addEventListener('click', function (evt) {
-      if (evt.target.classList.contains('map__pin')) {
-        var clickedPin = evt.target;
-      } else if (evt.target.parentElement.classList.contains('map__pin')) {
-        clickedPin = evt.target.parentElement;
-      }
-
-      var previousCard = map.querySelector('.map__card');
-      if (clickedPin && !isSamePinClicked(previousCard, clickedPin)) {
-        openOfferCard(clickedPin, similarOffers);
-      }
-    });
-
-    mapPinsList.addEventListener('keydown', function (evt) {
-      if (evt.target.classList.contains('map__pin')) {
-        var clickedPin = evt.target;
-      } else if (evt.target.parentElement.classList.contains('map__pin')) {
-        clickedPin = evt.target.parentElement;
-      }
-
-      var previousCard = map.querySelector('.map__card');
-      if (evt.key === ENTER_KEY && !isSamePinClicked(previousCard, clickedPin)) {
-        openOfferCard(clickedPin, similarOffers);
-      }
-    });
-
-    mapMainPin.addEventListener('keydown', function (evt) {
-      evt.stopPropagation();
-    });
-
-    mapMainPin.addEventListener('click', function (evt) {
-      evt.stopPropagation();
-    });
   };
+
+  // фильтрация объявлений
+  filters.addEventListener('change', function () {
+    window.debounce(function () {
+      window.filter.set(similarOffers);
+    });
+  });
+
+  // показ карточки при клике на пин
+  mapPinsList.addEventListener('click', function (evt) {
+    if (evt.target.classList.contains('map__pin')) {
+      var clickedPin = evt.target;
+    } else if (evt.target.parentElement.classList.contains('map__pin')) {
+      clickedPin = evt.target.parentElement;
+    }
+
+    var previousCard = map.querySelector('.map__card');
+    if (clickedPin && !isSamePinClicked(previousCard, clickedPin)) {
+      window.card.open(clickedPin, similarOffers);
+    }
+  });
+
+  mapPinsList.addEventListener('keydown', function (evt) {
+    if (evt.target.classList.contains('map__pin')) {
+      var clickedPin = evt.target;
+    } else if (evt.target.parentElement.classList.contains('map__pin')) {
+      clickedPin = evt.target.parentElement;
+    }
+
+    var previousCard = map.querySelector('.map__card');
+    if (evt.key === ENTER_KEY && !isSamePinClicked(previousCard, clickedPin)) {
+      window.card.open(clickedPin, similarOffers);
+    }
+  });
+
+  mapMainPin.addEventListener('keydown', function (evt) {
+    evt.stopPropagation();
+  });
+
+  mapMainPin.addEventListener('click', function (evt) {
+    evt.stopPropagation();
+  });
 
   var errorHandler = function (errorMessage) {
     var errorPopup = document.createElement('div');
@@ -73,42 +82,6 @@
     document.body.insertAdjacentElement('afterbegin', errorPopup);
   };
 
-  var offerCardCloseButtonHandler = function () {
-    closeOfferCard();
-  };
-
-  var offerCardEcsPressHandler = function (evt) {
-    if (evt.key === ESC_KEY) {
-      closeOfferCard();
-    }
-  };
-
-  var openOfferCard = function (target, offerData) {
-    closeOfferCard();
-
-    var id = Number(target.dataset.id);
-    var targetOffer = offerData.find(function (offer) {
-      return offer.id === id;
-    });
-
-    map.insertBefore(window.card.create(targetOffer), filtersContainer);
-
-    var card = map.querySelector('.map__card');
-    var cardCloseButton = card.querySelector('.popup__close');
-    card.dataset.id = id;
-    cardCloseButton.addEventListener('click', offerCardCloseButtonHandler);
-    document.addEventListener('keydown', offerCardEcsPressHandler);
-  };
-
-  var closeOfferCard = function () {
-    var card = map.querySelector('.map__card');
-    if (card) {
-      card.remove();
-      card.removeEventListener('click', offerCardCloseButtonHandler);
-      document.removeEventListener('keydown', offerCardEcsPressHandler);
-    }
-  };
-
   var isSamePinClicked = function (card, pin) {
     return (card && card.dataset.id === pin.dataset.id);
   };
@@ -116,29 +89,19 @@
   var isActive = false;
 
   window.map = {
+    PIN_AMOUNT: 5,
     activation: {
       enable: function () {
         isActive = true;
 
-        if (mapPinsList.children.length < similarOffers.length) {
-          mapPinsList.appendChild(window.pin.createList(similarOffers));
-        }
-
+        window.pin.draw(reducedOffers);
         map.classList.remove('map--faded');
-
         mapFilters.classList.remove('map__filters--disabled');
       },
       disable: function () {
-        for (var i = mapPinsList.children.length - 1; i > 0; i--) {
-          if (!mapPinsList.children[i].classList.contains('map__pin--main')) {
-            mapPinsList.removeChild(mapPinsList.children[i]);
-          }
-        }
-
+        window.pin.remove();
         map.classList.add('map--faded');
-
         mapFilters.classList.add('map__filters--disabled');
-
         window.address.setStartLocation(startLocation);
 
         isActive = false;
