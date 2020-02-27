@@ -1,19 +1,21 @@
 'use strict';
 
 (function () {
+  var ENTER_KEYCODE = 13;
+  var ESC_KEYCODE = 27;
+
   window.utils = {
     // [minNumber, maxNumber]
     generateNumber: function (minNumber, maxNumber) {
       return Math.round(Math.random() * (maxNumber - minNumber) + minNumber);
     },
-    generateUniqueArray: function (array, length) {
-      var newArray = [];
-
-      for (var i = 0; i < length; i++) {
-        newArray.push(array[i]);
+    isKeyPressed: {
+      enter: function (evt) {
+        return evt.keyCode === ENTER_KEYCODE;
+      },
+      escape: function (evt) {
+        return evt.keyCode === ESC_KEYCODE;
       }
-
-      return newArray;
     }
   };
 })();

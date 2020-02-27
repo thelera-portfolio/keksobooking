@@ -9,11 +9,12 @@
   var MIN_PRICE = 10000;
   var MAX_PRICE = 50000;
 
-  var filters = document.querySelector('.map__filters');
-  var type = filters.querySelector('#housing-type');
-  var price = filters.querySelector('#housing-price');
-  var rooms = filters.querySelector('#housing-rooms');
-  var guests = filters.querySelector('#housing-guests');
+  var filtersList = document.querySelector('.map__filters');
+  var filters = filtersList.children;
+  var type = filtersList.querySelector('#housing-type');
+  var price = filtersList.querySelector('#housing-price');
+  var rooms = filtersList.querySelector('#housing-rooms');
+  var guests = filtersList.querySelector('#housing-guests');
 
   var getPriceRange = function (value) {
     if (value < MIN_PRICE) {
@@ -31,7 +32,7 @@
     },
     set: function (data) {
       var filteredArray = data;
-      var selectedFeatures = filters.querySelectorAll('input[name="features"]:checked');
+      var selectedFeatures = filtersList.querySelectorAll('input[name="features"]:checked');
       var featuresArray = Array.from(selectedFeatures).map(function (featureInput) {
         return featureInput.value;
       });
@@ -53,5 +54,17 @@
       window.pin.remove();
       window.pin.draw(window.filter.amount(filteredArray, window.map.PIN_AMOUNT));// выводим только заданное количество объявлений
     },
+    enable: function () {
+      Array.from(filters).forEach(function (filter) {
+        filter.removeAttribute('disabled', 'disabled');
+      });
+    },
+    disable: function () {
+      filtersList.reset();
+      Array.from(filters).forEach(function (filter) {
+        filter.setAttribute('disabled', 'disabled');
+      });
+    }
   };
+  window.filter.disable();
 })();

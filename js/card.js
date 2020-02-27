@@ -2,8 +2,8 @@
 
 (function () {
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-  var ESC_KEY = 'Escape';
-  var ACCOMODATION_SETTINGS = {
+
+  var accomadationSettingsMap = {
     palace: {
       label: 'дворец',
       price: 10000
@@ -21,6 +21,7 @@
       price: 0
     }
   };
+
   var map = document.querySelector('.map');
   var filtersContainer = map.querySelector('.map__filters-container');
 
@@ -73,7 +74,7 @@
     }
     avatar.src = cardData.author.avatar;
 
-    type.textContent = ACCOMODATION_SETTINGS[cardData.offer.type].label;
+    type.textContent = accomadationSettingsMap[cardData.offer.type].label;
 
     if (!cardData.offer.features || cardData.offer.features.length === 0) {
       featuresList.remove();
@@ -96,10 +97,11 @@
     }
 
     photo.src = cardData.offer.photos[0];
+
     for (var k = 1; k < cardData.offer.photos.length; k++) {
-      var newPhoto = photo.cloneNode();
-      photosList.appendChild(newPhoto);
-      newPhoto.src = cardData.offer.photos[k];
+      var cardPhoto = photo.cloneNode();
+      photosList.appendChild(cardPhoto);
+      cardPhoto.src = cardData.offer.photos[k];
     }
 
     return card;
@@ -110,7 +112,7 @@
   };
 
   var offerCardEcsPressHandler = function (evt) {
-    if (evt.key === ESC_KEY) {
+    if (window.utils.isKeyPressed.escape(evt)) {
       window.card.close();
     }
   };
@@ -135,6 +137,14 @@
     },
     close: function () {
       var card = map.querySelector('.map__card');
+
+      // у пина удаляем класс 'map__pin--active'
+      var pins = map.querySelectorAll('.map__pin');
+      Array.from(pins).forEach(function (pin) {
+        if (pin.classList.contains('map__pin--active')) {
+          pin.classList.remove('map__pin--active');
+        }
+      });
       if (card) {
         card.remove();
         card.removeEventListener('click', offerCardCloseButtonHandler);

@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var status = {
+  var StatusCode = {
     OK: {code: 200},
     BAD_REQUEST: {code: 400, errorMessage: 'Неверный запрос'},
     UNAUTHORIZED: {code: 401, errorMessage: 'Пользователь не авторизован'},
@@ -24,20 +24,20 @@
       var error;
 
       switch (xhr.status) {
-        case status.OK.code:
+        case StatusCode.OK.code:
           successHandler(xhr.response);
           break;
-        case status.BAD_REQUEST.code:
-          error = status.BAD_REQUEST.errorMessage;
+        case StatusCode.BAD_REQUEST.code:
+          error = StatusCode.BAD_REQUEST.errorMessage;
           break;
-        case status.UNAUTHORIZED.code:
-          error = status.UNAUTHORIZED.errorMessage;
+        case StatusCode.UNAUTHORIZED.code:
+          error = StatusCode.UNAUTHORIZED.errorMessage;
           break;
-        case status.NOT_FOUND.code:
-          error = status.NOT_FOUND.errorMessage;
+        case StatusCode.NOT_FOUND.code:
+          error = StatusCode.NOT_FOUND.errorMessage;
           break;
         default:
-          error = status.DEFAULT.errorMessage + xhr.status + ' ' + xhr.statusText;
+          error = StatusCode.DEFAULT.errorMessage + xhr.status + ' ' + xhr.statusText;
       }
 
       if (error) {

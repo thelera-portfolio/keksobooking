@@ -2,11 +2,21 @@
 
 (function () {
   var FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif'];
+
+  var PhotoSettings = {
+    WIDTH: '70px',
+    HEIGHT: '70px',
+    ALT_MESSAGE: 'Фотография жилья'
+  };
+
   var avatarInput = document.querySelector('#avatar');
   var avatarPicture = document.querySelector('.ad-form-header__avatar');
 
-  avatarInput.addEventListener('change', function () {
-    var file = avatarInput.files[0];
+  var accomodationImageInput = document.querySelector('#images');
+  var accomodationImage = document.querySelector('.ad-form__photo');
+
+  var setFileReader = function (input, picture) {
+    var file = input.files[0];
     var fileName = file.name.toLowerCase();
 
     var matches = FILE_TYPES.some(function (element) {
@@ -17,9 +27,29 @@
       var reader = new FileReader();
 
       reader.addEventListener('load', function () {
-        avatarPicture.src = reader.result;
+        if (picture.src) {
+          picture.src = reader.result;
+        } else {
+          var photoContainer = document.querySelector('.ad-form__photo-container');
+          var photo = picture.cloneNode();
+          var img = document.createElement('img');
+          photoContainer.appendChild(photo);
+          photo.appendChild(img);
+          img.src = reader.result;
+          img.style.width = PhotoSettings.WIDTH;
+          img.style.height = PhotoSettings.HEIGHT;
+          img.style.alt = PhotoSettings.ALT_MESSAGE;
+        }
       });
       reader.readAsDataURL(file);
     }
+  };
+
+  avatarInput.addEventListener('change', function () {
+    setFileReader(avatarInput, avatarPicture);
+  });
+
+  accomodationImageInput.addEventListener('change', function () {
+    setFileReader(accomodationImageInput, accomodationImage);
   });
 })();

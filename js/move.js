@@ -1,9 +1,12 @@
 'use strict';
 
 (function () {
-  var MAIN_PIN_WIDTH = 62;
-  var MAIN_PIN_HEIGHT = 84;
-  var X_OFFSET_MAIN_PIN = MAIN_PIN_WIDTH / 2;
+  var MainPin = {
+    MAIN_PIN_WIDTH: 62,
+    MAIN_PIN_HEIGHT: 84,
+  };
+
+  var X_OFFSET_MAIN_PIN = MainPin.MAIN_PIN_WIDTH / 2;
   var Y_MIN = 130;
   var Y_MAX = 630;
 
@@ -51,8 +54,8 @@
         mapMainPin.style.top = Y_MIN + 'px';
       }
 
-      if (mapMainPin.offsetTop >= (Y_MAX - MAIN_PIN_HEIGHT)) {
-        mapMainPin.style.top = ((Y_MAX - MAIN_PIN_HEIGHT)) + 'px';
+      if (mapMainPin.offsetTop >= (Y_MAX - MainPin.MAIN_PIN_HEIGHT)) {
+        mapMainPin.style.top = ((Y_MAX - MainPin.MAIN_PIN_HEIGHT)) + 'px';
       }
     };
 

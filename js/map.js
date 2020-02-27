@@ -1,12 +1,9 @@
 'use strict';
 
 (function () {
-  var ENTER_KEY = 'Enter';
-
   var map = document.querySelector('.map');
   var mapPinsList = map.querySelector('.map__pins');
   var mapMainPin = map.querySelector('.map__pin--main');
-  var mapFilters = map.querySelector('.map__filters');
   var filters = document.querySelector('.map__filters');
   var similarOffers;
   var reducedOffers;
@@ -16,12 +13,11 @@
   var successHandler = function (offerData) {
     similarOffers = offerData;
 
-    for (var i = 0; i < similarOffers.length; i++) {
-      similarOffers[i].id = i;
-    }
+    similarOffers.forEach(function (offer, index) {
+      offer.id = index;
+    });
 
     reducedOffers = window.filter.amount(similarOffers, window.map.PIN_AMOUNT);
-
     // переход в активный режим
     window.map.activation.enable();
     window.form.enable();
@@ -46,6 +42,7 @@
     var previousCard = map.querySelector('.map__card');
     if (clickedPin && !isSamePinClicked(previousCard, clickedPin)) {
       window.card.open(clickedPin, similarOffers);
+      clickedPin.classList.add('map__pin--active');
     }
   });
 
@@ -57,8 +54,9 @@
     }
 
     var previousCard = map.querySelector('.map__card');
-    if (evt.key === ENTER_KEY && !isSamePinClicked(previousCard, clickedPin)) {
+    if (window.utils.isKeyPressed.enter && !isSamePinClicked(previousCard, clickedPin)) {
       window.card.open(clickedPin, similarOffers);
+      clickedPin.classList.add('map__pin--active');
     }
   });
 
@@ -96,13 +94,14 @@
 
         window.pin.draw(reducedOffers);
         map.classList.remove('map--faded');
-        mapFilters.classList.remove('map__filters--disabled');
+        window.filter.enable();
       },
       disable: function () {
         window.pin.remove();
         map.classList.add('map--faded');
-        mapFilters.classList.add('map__filters--disabled');
+        window.filter.disable();
         window.address.setStartLocation(startLocation);
+        window.card.close();
 
         isActive = false;
       }
@@ -120,7 +119,7 @@
   });
 
   mapMainPin.addEventListener('keydown', function (evt) {
-    if (evt.key === ENTER_KEY && !isActive) {
+    if (window.utils.isKeyPressed.enter(evt) && !isActive) {
       window.backend.load(successHandler, errorHandler);
     }
   });
