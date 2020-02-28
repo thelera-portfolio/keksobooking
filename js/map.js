@@ -54,7 +54,7 @@
     }
 
     var previousCard = map.querySelector('.map__card');
-    if (window.utils.isKeyPressed.enter && !isSamePinClicked(previousCard, clickedPin)) {
+    if (window.utils.isKeyPressed.enter(evt) && !isSamePinClicked(previousCard, clickedPin)) {
       window.card.open(clickedPin, similarOffers);
       clickedPin.classList.add('map__pin--active');
     }

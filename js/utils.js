@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  var ENTER_KEYCODE = 13;
-  var ESC_KEYCODE = 27;
+  var ENTER_KEYCODE = 'Enter';
+  var ESC_KEYCODE = 'Escape';
 
   window.utils = {
     // [minNumber, maxNumber]
@@ -11,10 +11,10 @@
     },
     isKeyPressed: {
       enter: function (evt) {
-        return evt.keyCode === ENTER_KEYCODE;
+        return evt.key === ENTER_KEYCODE;
       },
       escape: function (evt) {
-        return evt.keyCode === ESC_KEYCODE;
+        return evt.key === ESC_KEYCODE;
       }
     }
   };

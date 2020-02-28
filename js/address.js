@@ -2,12 +2,12 @@
 
 (function () {
   var MainPin = {
-    MAIN_PIN_WIDTH: 62,
-    MAIN_PIN_HEIGHT: 84,
-    MAIN_PIN_TAIL_HEIGHT: 22
+    WIDTH: 62,
+    HEIGHT: 84,
+    TAIL_HEIGHT: 22
   };
 
-  var X_OFFSET_MAIN_PIN = MainPin.MAIN_PIN_WIDTH / 2;
+  var X_OFFSET_MAIN_PIN = MainPin.WIDTH / 2;
   var Y_MIN = 130;
   var Y_MAX = 630;
 
@@ -21,8 +21,8 @@
   window.address = {
     set: function () {
       var locationX = mapMainPin.offsetLeft + X_OFFSET_MAIN_PIN;
-      var locationY = mapMainPin.offsetTop + MainPin.MAIN_PIN_HEIGHT;
-      var startLocationY = mapMainPin.offsetTop + (MainPin.MAIN_PIN_HEIGHT - MainPin.MAIN_PIN_TAIL_HEIGHT) / 2;
+      var locationY = mapMainPin.offsetTop + MainPin.HEIGHT;
+      var startLocationY = mapMainPin.offsetTop + (MainPin.HEIGHT - MainPin.TAIL_HEIGHT) / 2;
 
       if (locationY < Y_MIN) {
         locationY = Y_MIN;
@@ -41,7 +41,7 @@
     getStartLocation: function () {
       var location = {};
       location.x = mapMainPin.offsetLeft + X_OFFSET_MAIN_PIN;
-      location.y = mapMainPin.offsetTop + (MainPin.MAIN_PIN_HEIGHT - MainPin.MAIN_PIN_TAIL_HEIGHT) / 2;
+      location.y = mapMainPin.offsetTop + (MainPin.HEIGHT - MainPin.TAIL_HEIGHT) / 2;
       location.left = mapMainPin.style.left;
       location.top = mapMainPin.style.top;
       return location;

@@ -2,6 +2,12 @@
 
 (function () {
   var ERROR_MESSAGE = 'Ошибка загрузки объявления. ';
+  var ERROR_BORDER_STYLE = '0 0 3px 3px #ff0000';
+
+  var TitleLength = {
+    MIN: 30,
+    MAX: 100
+  };
 
   var accomadationSettingsMap = {
     palace: {
@@ -62,6 +68,18 @@
   window.form.disable();
 
   // валидация формы
+  // заголовок объявления
+  var titleField = adForm.querySelector('input[name = "title"]');
+
+  titleField.addEventListener('input', function () {
+    if (titleField.value.length >= TitleLength.MIN && titleField.value.length <= TitleLength.MAX) {
+      titleField.setCustomValidity('');
+      titleField.removeAttribute('style');
+    } else {
+      titleField.setCustomValidity('Минимальная длина заголовка объявления — ' + TitleLength.MIN + ' символов, максимальная — ' + TitleLength.MAX);
+    }
+  });
+
   // установка соответствия количества гостей (спальных мест) с количеством комнат
   var roomsAmountErrorMessagesMap = {
     1: '1 комната — «для 1 гостя»',
@@ -75,6 +93,7 @@
   var checkRoomsValidity = function () {
     if ((amountOfRoomsInput.value >= amountOfGuestsInput.value && amountOfGuestsInput.value !== '0' && amountOfRoomsInput.value !== '100') || (amountOfGuestsInput.value === '0' && amountOfRoomsInput.value === '100')) {
       amountOfGuestsInput.setCustomValidity('');
+      amountOfGuestsInput.removeAttribute('style');
     } else {
       amountOfGuestsInput.setCustomValidity(roomsAmountErrorMessagesMap[amountOfRoomsInput.value]);
     }
@@ -109,6 +128,7 @@
       target.setCustomValidity(accomadationSettingsMap[accomodationTypeField.value].label + ' - минимальная цена за ночь ' + accomadationSettingsMap[accomodationTypeField.value].price);
     } else {
       target.setCustomValidity('');
+      priceField.removeAttribute('style');
     }
   });
 
@@ -159,6 +179,10 @@
 
     document.addEventListener('click', successAnswerPopupClickHandler);
     document.addEventListener('keydown', successAnswerPopupEscButtonHandler);
+
+    titleField.removeEventListener('invalid', addErrorBorderHandler);
+    amountOfGuestsInput.removeEventListener('invalid', addErrorBorderHandler);
+    priceField.removeEventListener('invalid', addErrorBorderHandler);
   };
 
   var errorHandler = function (message) {
@@ -175,9 +199,18 @@
     evt.preventDefault();
 
     window.backend.save(succeessHandler, errorHandler, new FormData(adForm));
-
-
   });
+
+  // подсветка полей с ошибками
+  var addErrorBorderHandler = function (evt) {
+    evt.target.style.boxShadow = ERROR_BORDER_STYLE;
+  };
+
+  titleField.addEventListener('invalid', addErrorBorderHandler);
+
+  priceField.addEventListener('invalid', addErrorBorderHandler);
+
+  amountOfGuestsInput.addEventListener('invalid', addErrorBorderHandler);
 
   // нажатие на "Очистить форму"
   adFormResetButton.addEventListener('click', function () {
