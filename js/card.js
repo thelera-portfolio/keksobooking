@@ -79,18 +79,13 @@
     if (!cardData.offer.features || cardData.offer.features.length === 0) {
       featuresList.remove();
     }
+
     // удаляем из склонированного шаблона удобства, которых нет в данной карточке
-    for (var i = 0; i < FEATURES.length; i++) {
-      var count = 0;
-      for (var j = 0; j < cardData.offer.features.length; j++) {
-        if (FEATURES[i] === cardData.offer.features[j]) {
-          count += 1;
-        }
+    FEATURES.forEach(function (feature, index) {
+      if (cardData.offer.features.indexOf(feature) === -1) {
+        features[index].remove();
       }
-      if (count === 0) {
-        features[i].remove();
-      }
-    }
+    });
 
     if (!cardData.offer.photos || cardData.offer.photos.length === 0) {
       photosList.remove();
@@ -98,11 +93,13 @@
 
     photo.src = cardData.offer.photos[0];
 
-    for (var k = 1; k < cardData.offer.photos.length; k++) {
-      var cardPhoto = photo.cloneNode();
-      photosList.appendChild(cardPhoto);
-      cardPhoto.src = cardData.offer.photos[k];
-    }
+    cardData.offer.photos.forEach(function (offerPhoto, index) {
+      if (index !== 0) {
+        var cardPhoto = photo.cloneNode();
+        photosList.appendChild(cardPhoto);
+        cardPhoto.src = offerPhoto;
+      }
+    });
 
     return card;
   };

@@ -51,6 +51,8 @@
       });
 
       adFormHeaderFieldset.removeAttribute('disabled', 'disabled');
+
+      checkRoomsValidity();
     },
     disable: function () {
       adForm.classList.add('ad-form--disabled');
@@ -61,6 +63,8 @@
       });
 
       adFormHeaderFieldset.setAttribute('disabled', 'disabled');
+
+      window.avatarRemove();
     }
   };
 
@@ -98,8 +102,6 @@
       amountOfGuestsInput.setCustomValidity(roomsAmountErrorMessagesMap[amountOfRoomsInput.value]);
     }
   };
-
-  checkRoomsValidity();
 
   amountOfGuestsInput.addEventListener('change', function () {
     checkRoomsValidity();
@@ -142,33 +144,42 @@
     checkinTime.value = checkoutTime.value;
   });
 
+  // обработчики всплывающего окна о ошибке / успешной отправке данных
   var successAnswerPopupClickHandler = function () {
-    successAnswerPopup.parentNode.removeChild(successAnswerPopup);
+    mainContent.removeChild(successAnswerPopup);
     document.removeEventListener('click', successAnswerPopupClickHandler);
+    document.removeEventListener('keydown', successAnswerPopupEscButtonHandler);
   };
 
   var successAnswerPopupEscButtonHandler = function (evt) {
     if (window.utils.isKeyPressed.escape(evt)) {
-      successAnswerPopup.parentNode.removeChild(successAnswerPopup);
+      mainContent.removeChild(successAnswerPopup);
       document.removeEventListener('keydown', successAnswerPopupEscButtonHandler);
+      document.removeEventListener('click', successAnswerPopupClickHandler);
     }
   };
 
   var errorPopupClickHandler = function () {
     errorPopup.parentNode.removeChild(errorPopup);
     document.removeEventListener('click', errorPopupClickHandler);
+    document.removeEventListener('keydown', errorPopupEscButtonHandler);
+    document.removeEventListener('click', errorPopupCloseButtonHandler);
   };
 
   var errorPopupEscButtonHandler = function (evt) {
     if (window.utils.isKeyPressed.escape(evt)) {
       errorPopup.parentNode.removeChild(errorPopup);
+      document.removeEventListener('click', errorPopupClickHandler);
       document.removeEventListener('keydown', errorPopupEscButtonHandler);
+      document.removeEventListener('click', errorPopupCloseButtonHandler);
     }
   };
 
   var errorPopupCloseButtonHandler = function () {
     errorPopup.parentNode.removeChild(errorPopup);
     document.removeEventListener('click', errorPopupClickHandler);
+    document.removeEventListener('keydown', errorPopupEscButtonHandler);
+    document.removeEventListener('click', errorPopupCloseButtonHandler);
   };
 
   var succeessHandler = function () {
@@ -179,10 +190,6 @@
 
     document.addEventListener('click', successAnswerPopupClickHandler);
     document.addEventListener('keydown', successAnswerPopupEscButtonHandler);
-
-    titleField.removeEventListener('invalid', addErrorBorderHandler);
-    amountOfGuestsInput.removeEventListener('invalid', addErrorBorderHandler);
-    priceField.removeEventListener('invalid', addErrorBorderHandler);
   };
 
   var errorHandler = function (message) {

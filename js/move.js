@@ -2,11 +2,11 @@
 
 (function () {
   var MainPin = {
-    MAIN_PIN_WIDTH: 62,
-    MAIN_PIN_HEIGHT: 84,
+    WIDTH: 62,
+    HEIGHT: 84
   };
 
-  var X_OFFSET_MAIN_PIN = MainPin.MAIN_PIN_WIDTH / 2;
+  var X_OFFSET_MAIN_PIN = MainPin.WIDTH / 2;
   var Y_MIN = 130;
   var Y_MAX = 630;
 
@@ -50,12 +50,12 @@
         mapMainPin.style.left = (mapWidth - X_OFFSET_MAIN_PIN) + 'px';
       }
 
-      if (mapMainPin.offsetTop <= Y_MIN) {
-        mapMainPin.style.top = Y_MIN + 'px';
+      if (mapMainPin.offsetTop <= (Y_MIN - MainPin.HEIGHT)) {
+        mapMainPin.style.top = (Y_MIN - MainPin.HEIGHT) + 'px';
       }
 
-      if (mapMainPin.offsetTop >= (Y_MAX - MainPin.MAIN_PIN_HEIGHT)) {
-        mapMainPin.style.top = ((Y_MAX - MainPin.MAIN_PIN_HEIGHT)) + 'px';
+      if (mapMainPin.offsetTop >= (Y_MAX - MainPin.HEIGHT)) {
+        mapMainPin.style.top = (Y_MAX - MainPin.HEIGHT) + 'px';
       }
     };
 

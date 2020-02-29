@@ -19,8 +19,8 @@
     var file = input.files[0];
     var fileName = file.name.toLowerCase();
 
-    var matches = FILE_TYPES.some(function (element) {
-      return fileName.endsWith(element);
+    var matches = FILE_TYPES.some(function (type) {
+      return fileName.endsWith(type);
     });
 
     if (matches) {
@@ -52,4 +52,14 @@
   accomodationImageInput.addEventListener('change', function () {
     setFileReader(accomodationImageInput, accomodationImage);
   });
+
+  window.avatarRemove = function () {
+    avatarPicture.src = 'img/muffin-grey.svg';
+    var accomodationPhotos = Array.from(document.querySelectorAll('.ad-form__photo'));
+    accomodationPhotos.forEach(function (photo, index) {
+      if (index !== 0) {
+        photo.remove();
+      }
+    });
+  };
 })();
