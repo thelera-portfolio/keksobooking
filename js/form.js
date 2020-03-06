@@ -42,6 +42,9 @@
   var errorMessage = errorPopup.querySelector('.error__message');
   var errorPopupCloseButton = errorTemplate.querySelector('.error__button');
 
+  var priceField = adForm.querySelector('input[name = "price"]');
+  var accomodationTypeField = adForm.querySelector('select[name = "type"]');
+
   window.form = {
     enable: function () {
       adForm.classList.remove('ad-form--disabled');
@@ -65,6 +68,8 @@
       adFormHeaderFieldset.setAttribute('disabled', 'disabled');
 
       window.avatarRemove();
+
+      priceField.placeholder = accomadationSettingsMap.flat.price;
     }
   };
 
@@ -112,9 +117,6 @@
   });
 
   // поле «Тип жилья» влияет на минимальное значение поля «Цена за ночь»
-  var priceField = adForm.querySelector('input[name = "price"]');
-  var accomodationTypeField = adForm.querySelector('select[name = "type"]');
-
   accomodationTypeField.addEventListener('change', function () {
     priceField.placeholder = accomadationSettingsMap[accomodationTypeField.value].price;
     if (priceField.value < accomadationSettingsMap[accomodationTypeField.value].price) {
